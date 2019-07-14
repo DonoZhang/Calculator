@@ -1,0 +1,60 @@
+body{
+    font-family: sans-serif; 
+}
+.calculator{
+    width: 416px;
+    margin: auto;
+    margin-top: 50px;
+}
+table{
+    border-collapse: collapse;
+}
+
+table, tr, td{
+    border: 2px solid rgb(194, 194, 194);
+}
+td{
+    width: 90px;
+    height: 60px;
+    text-align: center;
+    font-size: 25px;
+    color: white;
+}
+
+.result{
+    height:80px;
+    background: rgb(10,28,44);
+    font-size: 50px;
+    text-align: right;
+    padding-left: 25px;
+    padding-right: 25px;
+}
+
+.clear{
+    background: rgb(247, 79, 71);
+}
+
+.times, .equal{
+    background: rgb(46, 140, 223);
+}
+
+.operator{
+    background: rgb(225, 182, 51);
+}
+
+.number{
+    background: rgb(100, 100, 100);
+}
+
+td:not(.result){
+    user-select: none;
+    cursor: pointer;
+}
+
+td:not(.result):hover{
+    filter: brightness(0.9);
+}
+
+td:not(.result):active{
+    filter: brightness(0.7);
+}
