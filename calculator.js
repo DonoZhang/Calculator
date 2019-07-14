@@ -28,6 +28,56 @@ var lastOperator = ''; //判断优先级用
 //事件代理
 document.querySelector('table').addEventListener('click',function(event){
     var value = event.target.innerHTML;
+    work(value);
+});
+
+//监听键盘
+document.addEventListener('keydown', function(event){
+    var value;
+    //如果是数字
+    if(!event.shiftKey && event.keyCode >= 48 && event.keyCode <= 57){
+        value = event.keyCode - 48 + "";
+    }
+
+    //如果是小数点
+    if(!event.shiftKey && event.keyCode == 190){
+        value = '.';
+    }
+
+    //如果是^
+    if(event.shiftKey && event.keyCode == 54){
+        value = '🕑';
+    }
+
+    //加减乘除
+    if(!event.shiftKey && event.keyCode == 191){
+        value = '÷';
+    }
+    if(event.shiftKey && event.keyCode == 56){
+        value = '×';
+    }
+    if(!event.shiftKey && event.keyCode == 189){
+        value = '−';
+    }
+    if(event.shiftKey && event.keyCode == 187){
+        value = '+';
+    }
+
+    //等于
+    if(!event.shiftKey && (event.keyCode == 187 || event.keyCode == 13 || event.keyCode == 32)){
+        value = '=';
+    }
+
+    //clear
+    if(!event.shiftKey && (event.keyCode == 27 || event.keyCode == 8)){
+        value = 'C';
+    }
+
+    work(value);
+}); 
+
+
+function work(value){
     switch(value){
         //数字或小数点
         //在下面三类情况，都要保证expression/operand中没有多余的0，否则后面的eval会报错
@@ -96,6 +146,11 @@ document.querySelector('table').addEventListener('click',function(event){
             if(operatorCompare()){
                 //执行并显示运算
                 let result = calculate();
+                if(result === "Overflow"){
+                    document.querySelector('.result').innerHTML = result;
+                    doClear();
+                    break;
+                }
                 document.querySelector('.result').innerHTML = result;
                 expression = [result];
             }
@@ -105,6 +160,11 @@ document.querySelector('table').addEventListener('click',function(event){
         case '=': {
             expression.push(operand);
             let result = calculate();
+            if(result === "Overflow"){
+                document.querySelector('.result').innerHTML = result;
+                doClear();
+                break;
+            }
             doClear();
             document.querySelector('.result').innerHTML = result;
             expression = [result];
@@ -118,7 +178,7 @@ document.querySelector('table').addEventListener('click',function(event){
         }
         default:{}
     }
-});
+}
 
 function doClear(){
     operator = ''; 
@@ -151,10 +211,20 @@ function calculate(){
     var str;
     if(expression.indexOf('🕑') > -1){
         let index = expression.indexOf('🕑');
-        let x = expression[index-1];
-        let y = expression[index+1];
+        let increment = 0;
+        let x = expression[index - 1];
         expression[index - 1] = '';
-        expression[index + 1] = '';
+        for(;;)
+        {
+            if(expression[index + 1 + increment] === ''){
+                increment ++;
+            }
+            else{
+                break;
+            }
+        }
+        let y = expression[index + 1 + increment];
+        expression[index + 1 + increment] = '';
         //直接运算出来
         expression[index] = Math.pow(x, y);
     }
@@ -165,7 +235,11 @@ function calculate(){
     //+ 本类就是标准运算符所以不需要替换
 
     //最多显示10位
-    str = eval(str) + "";
+    var result = eval(str);
+    if(result > 9999999999 || result < -999999999){
+        return "Overflow";
+    }
+    str = result + "";
     str = str.slice(0, 10);
     return str;
 }
